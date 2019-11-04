@@ -96,6 +96,7 @@ export const findUser = async (username: string) => {
     });
     res.on("end", function(result) {
       console.log("done ");
+      client.unbind();
     });
   });
 };
