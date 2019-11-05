@@ -160,16 +160,11 @@ export const findUsers = (
       scope: "sub",
       attributes: defaultAttributes.user,
     };
-    console.log(`File: utils.ts,`, `Line: 170 => `, opts.filter);
 
     adClient().then(client => {
       client.search(baseDN, opts, function onSearch(err, results) {
         if (err) {
           reject(err);
-        }
-
-        if (!results) {
-          console.log(`No users found matching query ${opts.filter} `);
         }
 
         const users: SearchResultAttribute[][] = [];
