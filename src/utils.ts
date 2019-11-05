@@ -140,3 +140,47 @@ export const findGroup = (
     });
   });
 };
+
+const getCompoundFilter = (filter: string) => {
+  if (filter.charAt(0) === "(" && filter.charAt(filter.length - 1) === ")") {
+    return filter;
+  }
+  return "(" + filter + ")";
+};
+
+export const findUsers = (
+  query: string,
+): Promise<SearchResultAttribute[][]> => {
+  return new Promise((resolve, reject) => {
+    const defaultUserFilter =
+      "(|(objectClass=user)(objectClass=person))(!(objectClass=computer))(!(objectClass=group))";
+
+    const opts = {
+      filter: "(&" + defaultUserFilter + getCompoundFilter(query) + ")",
+      scope: "sub",
+      attributes: defaultAttributes.user,
+    };
+    console.log(`File: utils.ts,`, `Line: 170 => `, opts.filter);
+
+    adClient().then(client => {
+      client.search(baseDN, opts, function onSearch(err, results) {
+        if (err) {
+          reject(err);
+        }
+
+        if (!results) {
+          console.log(`No users found matching query ${opts.filter} `);
+        }
+
+        const users: SearchResultAttribute[][] = [];
+        results.on("searchEntry", entry =>
+          users.push(entry.attributes.map(el => el.json)),
+        );
+        results.on("end", () => {
+          client.unbind();
+          resolve(users);
+        });
+      });
+    });
+  });
+};
