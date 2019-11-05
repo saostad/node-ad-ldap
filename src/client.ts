@@ -18,6 +18,7 @@ export const adClient = (): Promise<ldap.Client> => {
       if (err) {
         reject(err);
       }
+      client.on("end", () => client.unbind());
       resolve(client);
     });
   });

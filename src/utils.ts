@@ -1,5 +1,6 @@
 import { SearchOptions } from "ldapjs";
 import { adClient, baseDN } from "./client";
+import _ from "lodash";
 
 // Pre-compile some common, frequently used regular expressions.
 const re = {
@@ -178,4 +179,85 @@ export const findUsers = (
       });
     });
   });
+};
+
+const getDistinguishedNames = (filter: string): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const opts = {
+      filter: filter,
+      scope: "sub",
+      attributes: ["dn"],
+    };
+
+    adClient().then(client => {
+      client.search(baseDN, opts, function(err, results) {
+        if (err) {
+          reject(err);
+        }
+
+        // Extract just the DN from the results
+        const dns = [];
+        results.on("searchEntry", entry => dns.push(entry.dn));
+        results.on("end", () => resolve(dns[0]));
+      });
+    });
+  });
+};
+
+const getUserDistinguishedName = (username: string): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    // Already a dn?
+    if (isDistinguishedName(username)) {
+      resolve(username);
+    }
+    const query = getUserQueryFilter(username);
+
+    getDistinguishedNames(query).then(dn => resolve(dn));
+  });
+};
+
+const joinAttributes = (...args) => {
+  for (let index = 0, length = args.length; index < length; index++) {
+    if (args[index]) {
+      return [];
+    }
+  }
+  return _.union(args);
+};
+
+const getGroupMembershipForDN = async (
+  dn: string,
+): Promise<SearchResultAttribute[][]> => {
+  return new Promise((resolve, reject) => {
+    const opts = {
+      filter: "(member=" + parseDistinguishedName(dn) + ")",
+      scope: "sub",
+      attributes: joinAttributes(defaultAttributes.group, ["groupType"]),
+    };
+
+    adClient().then(client => {
+      client.search(baseDN, opts, function(err, results) {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        const groups = [];
+        results.on("searchEntry", entry =>
+          groups.push(entry.attributes.map(el => el.json)),
+        );
+        results.on("end", () => {
+          resolve(groups);
+          client.unbind();
+        });
+      });
+    });
+  });
+};
+
+export const getGroupMembershipForUser = async (username: string) => {
+  const dn = await getUserDistinguishedName(username);
+
+  const groups = await getGroupMembershipForDN(dn);
+  return groups;
 };
