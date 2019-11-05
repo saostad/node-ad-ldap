@@ -1,5 +1,6 @@
-import { SearchOptions } from "ldapjs";
+import { SearchOptions, SearchEntry } from "ldapjs";
 import { adClient, baseDN } from "./client";
+import { rejects } from "assert";
 
 // Precompile some common, frequently used regular expressions.
 const re = {
@@ -26,11 +27,17 @@ const defaultAttributes = {
     "displayName",
     "comment",
     "description",
+    "distinguishedName",
+    "whenChanged",
+    "name",
+    "nTSecurityDescriptor",
+    "objectCategory",
+    "objectClass",
   ],
   group: ["dn", "cn", "description"],
 };
 
-const isDistinguishedName = value => {
+const isDistinguishedName = (value: string) => {
   if (!value || value.length === 0) return false;
   re.isDistinguishedName.lastIndex = 0; // Reset the regular expression
   return re.isDistinguishedName.test(value);
@@ -72,31 +79,32 @@ const isUserMemberOf = (username: string, groupName: string) => {
   //getGroupMembershipForUser(username)
 };
 
-export const findUser = async (username: string) => {
-  const opts: SearchOptions = {
-    filter: getUserQueryFilter(username),
-    scope: "sub",
-    attributes: defaultAttributes.user,
-  };
-  const client = await adClient();
-  client.search(baseDN, opts, (err, res) => {
-    if (err) {
-      console.log(`File: utils.ts,`, `Line: 82 => `, err);
-    }
-    res.on("searchEntry", function(entry) {
-      entry.attributes.forEach(el => {
-        console.log(el.toString());
+interface FindUserResult {
+  type: string;
+  vals: string[];
+}
+export const findUser = (username: string): Promise<FindUserResult[]> => {
+  return new Promise((resolve, reject) => {
+    const opts: SearchOptions = {
+      filter: getUserQueryFilter(username),
+      scope: "sub",
+      attributes: defaultAttributes.user,
+    };
+    adClient().then(client => {
+      client.search(baseDN, opts, (err, res) => {
+        if (err) {
+          reject(err);
+        }
+        res.on("searchEntry", function(entry) {
+          resolve(entry.attributes.map(el => el.json));
+        });
+        res.on("error", function(resErr) {
+          reject(resErr);
+        });
+        res.on("end", function(result) {
+          client.unbind();
+        });
       });
-    });
-    res.on("page", function(result) {
-      console.log("page end", result);
-    });
-    res.on("error", function(resErr) {
-      console.log(`File: app.ts,`, `Line: 40 => `, resErr);
-    });
-    res.on("end", function(result) {
-      console.log("done ");
-      client.unbind();
     });
   });
 };

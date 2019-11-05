@@ -3,10 +3,8 @@ dotenv.config();
 import { findUser } from "./utils";
 
 async function main() {
-  const testUserName = "SOstad";
-
-  await findUser("aparente");
-  await findUser("sostad");
+  const user1 = await findUser("aparente");
+  console.log(`File: app.ts,`, `Line: 9 => `, user1);
 }
 
 main();
