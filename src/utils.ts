@@ -78,7 +78,7 @@ export const findUser = async (username: string) => {
     scope: "sub",
     attributes: defaultAttributes.user,
   };
-  const client = await adClient;
+  const client = await adClient();
   client.search(baseDN, opts, (err, res) => {
     if (err) {
       console.log(`File: utils.ts,`, `Line: 82 => `, err);

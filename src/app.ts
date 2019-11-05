@@ -5,7 +5,8 @@ import { findUser } from "./utils";
 async function main() {
   const testUserName = "SOstad";
 
-  await findUser(testUserName);
+  await findUser("aparente");
+  await findUser("sostad");
 }
 
 main();
