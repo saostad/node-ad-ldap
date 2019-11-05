@@ -1,8 +1,7 @@
-import { SearchOptions, SearchEntry } from "ldapjs";
+import { SearchOptions } from "ldapjs";
 import { adClient, baseDN } from "./client";
-import { rejects } from "assert";
 
-// Precompile some common, frequently used regular expressions.
+// Pre-compile some common, frequently used regular expressions.
 const re = {
   isDistinguishedName: /(([^=]+=.+),?)+/gi,
   isUserResult: /CN=Person,CN=Schema,CN=Configuration,.*/i,
@@ -50,7 +49,7 @@ const parseDistinguishedName = (dn: string) => {
   return dn.replace("\\,", "\\\\,");
 };
 
-export const getUserQueryFilter = (username: string) => {
+export const getUserQueryFilter = (username?: string): string => {
   if (!username) return "(objectCategory=User)";
   if (isDistinguishedName(username)) {
     return (
@@ -69,21 +68,13 @@ export const getUserQueryFilter = (username: string) => {
   );
 };
 
-const getUserDistinguishedName = (username: string) => {};
-
-const getGroupMembershipForUser = (username: string) => {
-  //getUserDistinguishedName(username)
-};
-
-const isUserMemberOf = (username: string, groupName: string) => {
-  //getGroupMembershipForUser(username)
-};
-
-interface FindUserResult {
+interface SearchResultAttribute {
   type: string;
   vals: string[];
 }
-export const findUser = (username: string): Promise<FindUserResult[]> => {
+export const findUser = (
+  username: string,
+): Promise<SearchResultAttribute[]> => {
   return new Promise((resolve, reject) => {
     const opts: SearchOptions = {
       filter: getUserQueryFilter(username),
@@ -104,6 +95,47 @@ export const findUser = (username: string): Promise<FindUserResult[]> => {
         res.on("end", function(result) {
           client.unbind();
         });
+      });
+    });
+  });
+};
+
+const getGroupQueryFilter = (groupName: string) => {
+  if (!groupName) return "(objectCategory=Group)";
+  if (isDistinguishedName(groupName)) {
+    return (
+      "(&(objectCategory=Group)(distinguishedName=" +
+      parseDistinguishedName(groupName) +
+      "))"
+    );
+  }
+  return "(&(objectCategory=Group)(cn=" + groupName + "))";
+};
+
+export const findGroup = (
+  groupName: string,
+): Promise<SearchResultAttribute[]> => {
+  return new Promise((resolve, reject) => {
+    const opts = {
+      filter: getGroupQueryFilter(groupName),
+      scope: "sub",
+      attributes: defaultAttributes.group,
+    };
+
+    adClient().then(client => {
+      client.search(baseDN, opts, function onSearch(err, results) {
+        if (err) {
+          reject(err);
+        }
+
+        if (!results) {
+          reject(`Group ${groupName} not found`);
+        }
+        results.on("searchEntry", entry =>
+          resolve(entry.attributes.map(el => el.json)),
+        );
+        results.on("error", err => reject(err));
+        results.on("end", () => client.unbind());
       });
     });
   });

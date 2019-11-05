@@ -1,10 +1,10 @@
 import dotenv from "dotenv";
 dotenv.config();
-import { findUser } from "./utils";
+import { findUser, findGroup } from "./utils";
 
 async function main() {
-  const user1 = await findUser("aparente");
-  console.log(`File: app.ts,`, `Line: 9 => `, user1);
+  const group = await findGroup("Users");
+  console.log(`File: app.ts,`, `Line: 7 => `, group);
 }
 
 main();
