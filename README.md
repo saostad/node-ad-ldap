@@ -1,16 +1,8 @@
-# node-typescript-starter
+#How to use it:
 
-# How to use
+##users for core5 company
 
-`git clone https://github.com/saostad/node-typescript-starter.git YOUR_PROJECT_NAME`
-
-`npm install`
-
-`npm start`
-
-## Powered By:
-
-- [x] typescript
-- [x] ts-node
-- [x] eslint
-- [x] prettier
+```
+const users = await findUsers("userPrincipalName=*C5IP*");
+users.forEach(el => console.log(`el));
+```

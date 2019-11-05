@@ -115,12 +115,15 @@ const getGroupQueryFilter = (groupName: string) => {
 
 export const findGroup = (
   groupName: string,
+  options: { attributes: string[] },
 ): Promise<SearchResultAttribute[]> => {
   return new Promise((resolve, reject) => {
     const opts = {
       filter: getGroupQueryFilter(groupName),
       scope: "sub",
-      attributes: defaultAttributes.group,
+      attributes: options.attributes
+        ? options.attributes
+        : defaultAttributes.group,
     };
 
     adClient().then(client => {
