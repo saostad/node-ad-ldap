@@ -4,15 +4,13 @@ export enum GroupAttributes {
   ADsPath = "ADsPath",
   authOrig = "authOrig",
   authOrigBL = "authOrigBL",
-  canonicalName = "canonicalName",
-  Class = "Class",
   cn = "cn",
   createTimeStamp = "createTimeStamp",
   delivContLength = "delivContLength",
   descritpion = "descritpion",
   displayName = "displayName",
   displayNamePrintable = "displayNamePrintable",
-  distinguishedName = "distinguishedName",
+  distinguedName = "distinguishedName",
   dLMemRejectPerms = "dLMemRejectPerms",
   dLMemRejectPermsBL = "dLMemRejectPermsBL",
   dLMemSubmitPerms = "dLMemSubmitPerms",
@@ -69,9 +67,14 @@ export interface GroupFields extends GroupFieldsName {
   telephoneNumber?: number;
 }
 
-export class Group {
-  name: string;
-  constructor(fields: GroupFields) {
-    this.name = fields.name;
+export class Group implements GroupFields {
+  constructor(fields?: GroupFields) {
+    if (fields) {
+      for (const i of fields) {
+        // this.[name] = fields.name;
+      }
+    }
   }
 }
+
+const g1 = new Group();
