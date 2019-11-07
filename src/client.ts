@@ -11,16 +11,16 @@ export interface SearchResultAttribute {
 }
 
 export class AdClient {
-  config: IClientConfig;
-  client: ldap.Client;
+  private config: IClientConfig;
+  private client: ldap.Client;
 
-  re = {
+  private re = {
     isDistinguishedName: /(([^=]+=.+),?)+/gi,
     isUserResult: /CN=Person,CN=Schema,CN=Configuration,.*/i,
     isGroupResult: /CN=Group,CN=Schema,CN=Configuration,.*/i,
   };
 
-  defaultAttributes = {
+  private defaultAttributes = {
     user: [
       "dn",
       "userPrincipalName",
@@ -65,20 +65,20 @@ export class AdClient {
     });
   }; /**end bind() */
 
-  isDistinguishedName = (value: string) => {
+  private isDistinguishedName = (value: string) => {
     if (!value || value.length === 0) return false;
     this.re.isDistinguishedName.lastIndex = 0; // Reset the regular expression
     return this.re.isDistinguishedName.test(value);
   };
 
-  parseDistinguishedName = (dn: string) => {
+  private parseDistinguishedName = (dn: string) => {
     if (!dn) return dn;
 
     dn = dn.replace(/"/g, '\\"');
     return dn.replace("\\,", "\\\\,");
   };
 
-  getUserQueryFilter = (username?: string): string => {
+  private getUserQueryFilter = (username?: string): string => {
     if (!username) return "(objectCategory=User)";
     if (this.isDistinguishedName(username)) {
       return (
@@ -123,7 +123,7 @@ export class AdClient {
     });
   };
 
-  getGroupQueryFilter = (groupName: string) => {
+  private getGroupQueryFilter = (groupName: string) => {
     if (!groupName) return "(objectCategory=Group)";
     if (this.isDistinguishedName(groupName)) {
       return (
@@ -170,7 +170,7 @@ export class AdClient {
     });
   };
 
-  getCompoundFilter = (filter: string) => {
+  private getCompoundFilter = (filter: string) => {
     if (filter.charAt(0) === "(" && filter.charAt(filter.length - 1) === ")") {
       return filter;
     }
@@ -210,7 +210,7 @@ export class AdClient {
     });
   };
 
-  getDistinguishedNames = (filter: string): Promise<string> => {
+  private getDistinguishedNames = (filter: string): Promise<string> => {
     return new Promise((resolve, reject) => {
       const opts = {
         filter: filter,
@@ -233,7 +233,7 @@ export class AdClient {
     });
   };
 
-  getUserDistinguishedName = (username: string): Promise<string> => {
+  private getUserDistinguishedName = (username: string): Promise<string> => {
     return new Promise((resolve, reject) => {
       // Already a dn?
       if (this.isDistinguishedName(username)) {
@@ -245,7 +245,7 @@ export class AdClient {
     });
   };
 
-  joinAttributes = (...args) => {
+  private joinAttributes = (...args) => {
     for (let index = 0, length = args.length; index < length; index++) {
       if (args[index]) {
         return [];
@@ -254,7 +254,7 @@ export class AdClient {
     return _.union(args);
   };
 
-  getGroupMembershipForDN = async (
+  private getGroupMembershipForDN = async (
     dn: string,
   ): Promise<SearchResultAttribute[][]> => {
     return new Promise((resolve, reject) => {
