@@ -152,9 +152,13 @@ enum UserAttributes {
   wWWHomePage = "wWWHomePage",
 }
 
-export type UserFields = {
-  [key in keyof typeof UserAttributes]?: string;
+type GroupFieldsName = {
+  [key in keyof typeof UserAttributes]?: any;
 };
+
+export interface UserFields extends GroupFieldsName {
+  wWWHomePage?: boolean;
+}
 
 export class User {
   name: string;

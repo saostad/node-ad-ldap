@@ -61,9 +61,13 @@ export enum GroupAttributes {
   whenCreated = "whenCreated",
 }
 
-export type GroupFields = {
-  [key in keyof typeof GroupAttributes]?: string;
+type GroupFieldsName = {
+  [key in keyof typeof GroupAttributes]?: any;
 };
+
+export interface GroupFields extends GroupFieldsName {
+  telephoneNumber?: number;
+}
 
 export class Group {
   name: string;
