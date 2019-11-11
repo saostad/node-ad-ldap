@@ -16,8 +16,8 @@ async function main() {
     baseDN,
   };
   const adClient = new AdClient(config);
-  const groups = await adClient.getGroupMembershipForUser("sostad");
-  groups.map(el => console.log(`File: app.ts,`, `Line: 14 => `, el));
+  const items = await adClient.getGroupMembershipForUser("sostad");
+  items.map(el => console.log(`File: app.ts,`, `Line: 20 => `, el.cn));
 }
 
 main();

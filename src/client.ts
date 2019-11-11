@@ -1,6 +1,7 @@
 import ldap from "ldapjs";
 import _ from "lodash";
 import { Group } from "./group";
+import { User } from "./user";
 
 export interface IClientConfig extends ldap.ClientOptions {
   secret: string;
@@ -53,7 +54,7 @@ export class AdClient {
     this.config = config;
   }
 
-  bind = (): Promise<ldap.Client> => {
+  public bind = (): Promise<ldap.Client> => {
     return new Promise((resolve, reject) => {
       this.client = ldap.createClient(this.config);
 
@@ -98,7 +99,7 @@ export class AdClient {
     );
   };
 
-  findUser = (username: string): Promise<SearchResultAttribute[]> => {
+  public findUser = (username: string): Promise<User> => {
     return new Promise((resolve, reject) => {
       const opts: ldap.SearchOptions = {
         filter: this.getUserQueryFilter(username),
@@ -111,7 +112,7 @@ export class AdClient {
             reject(err);
           }
           res.on("searchEntry", function(entry) {
-            resolve(entry.attributes.map(el => el.json));
+            resolve(new User().rawToObj(entry.attributes));
           });
           res.on("error", function(resErr) {
             reject(resErr);
@@ -136,15 +137,16 @@ export class AdClient {
     return "(&(objectCategory=Group)(cn=" + groupName + "))";
   };
 
-  findGroup = (
+  /**@returns first found group */
+  public findGroup = (
     groupName: string,
-    options: { attributes: string[] },
-  ): Promise<SearchResultAttribute[]> => {
+    options?: { attributes: string[] },
+  ): Promise<Group> => {
     return new Promise((resolve, reject) => {
       const opts = {
         filter: this.getGroupQueryFilter(groupName),
         scope: "sub",
-        attributes: options.attributes
+        attributes: options?.attributes
           ? options.attributes
           : this.defaultAttributes.group,
       };
@@ -162,7 +164,7 @@ export class AdClient {
             reject(`Group ${groupName} not found`);
           }
           results.on("searchEntry", entry =>
-            resolve(entry.attributes.map(el => el.json)),
+            resolve(new Group().rawToObj(entry.attributes)),
           );
           results.on("error", err => reject(err));
           results.on("end", () => client.unbind());
@@ -178,7 +180,7 @@ export class AdClient {
     return "(" + filter + ")";
   };
 
-  findUsers = (query: string): Promise<SearchResultAttribute[][]> => {
+  public findUsers = (query: string): Promise<User[]> => {
     return new Promise((resolve, reject) => {
       const defaultUserFilter =
         "(|(objectClass=user)(objectClass=person))(!(objectClass=computer))(!(objectClass=group))";
@@ -204,7 +206,7 @@ export class AdClient {
           );
           results.on("end", () => {
             client.unbind();
-            resolve(users);
+            resolve(users.map(el => new User().rawToObj(el)));
           });
         });
       });
@@ -287,11 +289,11 @@ export class AdClient {
     });
   };
 
-  getGroupMembershipForUser = async (username: string) => {
+  public getGroupMembershipForUser = async (username: string) => {
     const dn = await this.getUserDistinguishedName(username);
 
     const groups = await this.getGroupMembershipForDN(dn);
-    const groupsObj = groups.map(el => new Group().rawToGroupObj(el));
+    const groupsObj = groups.map(el => new Group().rawToObj(el));
     return groupsObj;
   };
 }

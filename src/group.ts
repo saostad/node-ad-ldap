@@ -1,4 +1,5 @@
 import { SearchResultAttribute } from "./client";
+import ldap from "ldapjs";
 
 export enum GroupAttributes {
   adminDescription = "adminDescription",
@@ -66,84 +67,90 @@ type GroupFieldsName = {
 };
 
 export interface GroupFields extends GroupFieldsName {
-  telephoneNumber?: string;
+  telephoneNumber?: string[];
 }
 
 export class Group implements GroupFields {
-  adminDescription?: string;
-  adminDisplayName?: string;
-  ADsPath?: string;
-  authOrig?: string;
-  authOrigBL?: string;
-  cn?: string;
-  createTimeStamp?: string;
-  delivContLength?: string;
-  descritpion?: string;
-  displayName?: string;
-  displayNamePrintable?: string;
-  distinguedName?: string;
-  dLMemRejectPerms?: string;
-  dLMemRejectPermsBL?: string;
-  dLMemSubmitPerms?: string;
-  dLMemSubmitPermsBL?: string;
-  extensionAttribute?: string;
-  groupType?: string;
-  homeMTA?: string;
-  info?: string;
-  isDeleted?: string;
-  legacyExchangeDN?: string;
-  mail?: string;
-  mailNickName?: string;
-  managedBy?: string;
-  member?: string;
-  memberOf?: string;
-  modifyTimeStamp?: string;
-  msExchExpansionServerName?: string;
-  msExchHideFromAddressLists?: string;
-  msExchHomeServerName?: string;
-  msExchRequireAuthToSendTo?: string;
-  msSFU30GidNumber?: string;
-  msSFU30Name?: string;
-  msSFU30NisDomain?: string;
-  msSFU30PosixMember?: string;
-  name?: string;
-  Name?: string;
-  nTSecurityDescriptor?: string;
-  objectCategory?: string;
-  objectClass?: string;
-  objectGUID?: string;
-  objectSid?: string;
-  oOFReplyToOriginator?: string;
-  Parent?: string;
-  primaryGroupToken?: string;
-  proxyAddresses?: string;
-  reportToOriginator?: string;
-  reportToOwner?: string;
-  sAMAccountName?: string;
-  telephoneNumber?: string;
-  textEncodedORAddress?: string;
-  unauthOrig?: string;
-  unauthOrigBL?: string;
-  uSNChanged?: string;
-  uSNCreated?: string;
-  whenChanged?: string;
-  whenCreated?: string;
+  readonly adminDescription?: string[];
+  readonly adminDisplayName?: string[];
+  readonly ADsPath?: string[];
+  readonly authOrig?: string[];
+  readonly authOrigBL?: string[];
+  readonly cn?: string[];
+  readonly createTimeStamp?: string[];
+  readonly delivContLength?: string[];
+  readonly descritpion?: string[];
+  readonly displayName?: string[];
+  readonly displayNamePrintable?: string[];
+  readonly distinguedName?: string[];
+  readonly dLMemRejectPerms?: string[];
+  readonly dLMemRejectPermsBL?: string[];
+  readonly dLMemSubmitPerms?: string[];
+  readonly dLMemSubmitPermsBL?: string[];
+  readonly extensionAttribute?: string[];
+  readonly groupType?: string[];
+  readonly homeMTA?: string[];
+  readonly info?: string[];
+  readonly isDeleted?: string[];
+  readonly legacyExchangeDN?: string[];
+  readonly mail?: string[];
+  readonly mailNickName?: string[];
+  readonly managedBy?: string[];
+  readonly member?: string[];
+  readonly memberOf?: string[];
+  readonly modifyTimeStamp?: string[];
+  readonly msExchExpansionServerName?: string[];
+  readonly msExchHideFromAddressLists?: string[];
+  readonly msExchHomeServerName?: string[];
+  readonly msExchRequireAuthToSendTo?: string[];
+  readonly msSFU30GidNumber?: string[];
+  readonly msSFU30Name?: string[];
+  readonly msSFU30NisDomain?: string[];
+  readonly msSFU30PosixMember?: string[];
+  readonly name?: string[];
+  readonly Name?: string[];
+  readonly nTSecurityDescriptor?: string[];
+  readonly objectCategory?: string[];
+  readonly objectClass?: string[];
+  readonly objectGUID?: string[];
+  readonly objectSid?: string[];
+  readonly oOFReplyToOriginator?: string[];
+  readonly Parent?: string[];
+  readonly primaryGroupToken?: string[];
+  readonly proxyAddresses?: string[];
+  readonly reportToOriginator?: string[];
+  readonly reportToOwner?: string[];
+  readonly sAMAccountName?: string[];
+  readonly telephoneNumber?: string[];
+  readonly textEncodedORAddress?: string[];
+  readonly unauthOrig?: string[];
+  readonly unauthOrigBL?: string[];
+  readonly uSNChanged?: string[];
+  readonly uSNCreated?: string[];
+  readonly whenChanged?: string[];
+  readonly whenCreated?: string[];
 
   setFields(fields: GroupFields) {
-    if (fields) {
-      for (const [key, value] of Object.entries(fields)) {
-        this[key] = value;
-      }
+    for (const [key, value] of Object.entries(fields)) {
+      this[key] = value;
     }
     return this;
   }
 
-  rawToGroupObj(data: SearchResultAttribute[]) {
-    data.forEach(el => {
+  rawToObj(
+    data: SearchResultAttribute | SearchResultAttribute[] | ldap.Attribute[],
+  ) {
+    if (Array.isArray(data)) {
+      data.forEach(el => {
+        const fields: GroupFields = {};
+        fields[el.type] = el.vals;
+        this.setFields(fields);
+      });
+    } else {
       const fields: GroupFields = {};
-      fields[el.type] = el.vals;
+      fields[data.type] = data.vals;
       this.setFields(fields);
-    });
+    }
     return this;
   }
 }
