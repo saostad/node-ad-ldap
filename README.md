@@ -13,10 +13,10 @@ inspired by package [activedirectory](https://www.npmjs.com/package/activedirect
 import { IClientConfig, AdClient } from "./client";
 
 const config: IClientConfig = {
-  url: "ldap://ki.local",
-  bindDN,
-  secret,
-  baseDN,
+  url: "ldap://Domain.com" /** Domain name here */,
+  bindDN: "" /** user name to connect to AD server */,
+  secret: "" /** password for account */,
+  baseDN: "" /** root of tree that want to query */,
 };
 const adClient = new AdClient(config);
 const items = await adClient.getGroupMembershipForUser("sostad");
