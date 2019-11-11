@@ -1,3 +1,5 @@
+import { SearchResultAttribute } from "./client";
+
 export enum GroupAttributes {
   adminDescription = "adminDescription",
   adminDisplayName = "adminDisplayName",
@@ -127,12 +129,21 @@ export class Group implements GroupFields {
   whenChanged?: string;
   whenCreated?: string;
 
-  constructor(fields?: GroupFields) {
+  setFields(fields: GroupFields) {
     if (fields) {
       for (const [key, value] of Object.entries(fields)) {
-        this.[key] = value;
+        this[key] = value;
       }
     }
+    return this;
+  }
+
+  rawToGroupObj(data: SearchResultAttribute[]) {
+    data.forEach(el => {
+      const fields: GroupFields = {};
+      fields[el.type] = el.vals;
+      this.setFields(fields);
+    });
+    return this;
   }
 }
-

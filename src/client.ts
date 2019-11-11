@@ -1,5 +1,6 @@
 import ldap from "ldapjs";
 import _ from "lodash";
+import { Group } from "./group";
 
 export interface IClientConfig extends ldap.ClientOptions {
   secret: string;
@@ -290,6 +291,7 @@ export class AdClient {
     const dn = await this.getUserDistinguishedName(username);
 
     const groups = await this.getGroupMembershipForDN(dn);
-    return groups;
+    const groupsObj = groups.map(el => new Group().rawToGroupObj(el));
+    return groupsObj;
   };
 }
