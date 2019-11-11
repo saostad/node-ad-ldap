@@ -289,7 +289,9 @@ export class AdClient {
     });
   };
 
-  public getGroupMembershipForUser = async (username: string) => {
+  public getGroupMembershipForUser = async (
+    username: string,
+  ): Promise<Group[]> => {
     const dn = await this.getUserDistinguishedName(username);
 
     const groups = await this.getGroupMembershipForDN(dn);
