@@ -1,6 +1,6 @@
 {
-  "name": "node-ts-starter",
-  "version": "1.0.0",
+  "name": "node-ad-ldap",
+  "version": "0.1.0",
   "description": "",
   "main": "./src/app.ts",
   "scripts": {
