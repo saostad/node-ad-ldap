@@ -9,8 +9,10 @@ inspired by package [activedirectory](https://www.npmjs.com/package/activedirect
 
 ## How to use it:
 
+- `npm i node-ad-ldap`
+
 ```
-import { IClientConfig, AdClient } from "./client";
+import { IClientConfig, AdClient } from "node-ad-ldap";
 
 const config: IClientConfig = {
   url: "ldap://Domain.com" /** Domain name here */,
