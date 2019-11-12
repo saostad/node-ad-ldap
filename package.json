@@ -1,9 +1,9 @@
 {
   "name": "node-ad-ldap",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "",
   "main": "dist/app.js",
-  "types": "dist/index.d.ts",
+  "types": "dist/app.d.ts",
   "scripts": {
     "format": "prettier --check \"src/**/*.ts\" --write",
     "lint": "eslint --ext \".ts,.js\" src --quiet",
