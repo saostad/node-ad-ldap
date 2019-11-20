@@ -1,6 +1,6 @@
 {
   "name": "node-ad-ldap",
-  "version": "0.1.7",
+  "version": "1.0.0",
   "description": "",
   "main": "dist/app.js",
   "types": "dist/app.d.ts",
@@ -28,17 +28,17 @@
     "delay": "1000"
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.146",
-    "@types/node": "^12.12.7",
-    "@typescript-eslint/eslint-plugin": "^2.6.1",
-    "@typescript-eslint/parser": "^2.6.1",
+    "@types/lodash": "^4.14.149",
+    "@types/node": "^12.12.11",
+    "@typescript-eslint/eslint-plugin": "^2.8.0",
+    "@typescript-eslint/parser": "^2.8.0",
     "dotenv": "^8.2.0",
     "eslint": "^6.6.0",
-    "eslint-config-prettier": "^6.5.0",
+    "eslint-config-prettier": "^6.7.0",
     "eslint-plugin-prettier": "^3.1.1",
     "nodemon": "^1.19.4",
     "prettier": "^1.19.1",
-    "ts-node": "^8.5.0",
+    "ts-node": "^8.5.2",
     "typescript": "^3.7.2"
   },
   "dependencies": {
