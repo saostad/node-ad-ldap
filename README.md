@@ -21,8 +21,8 @@ const config: IClientConfig = {
   baseDN: "" /** root of tree that want to query */,
 };
 const adClient = new AdClient(config);
-const items = await adClient.getGroupMembershipForUser("sostad");
-items.map(el => console.log(`File: app.ts,`, `Line: 20 => `, el.cn));
+const items = await adClient.getGroupMembershipForUser("USER_NAME");
+items.map(el => console.log(el.cn));
 ```
 
 ## Available functions:

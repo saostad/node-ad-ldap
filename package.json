@@ -1,7 +1,11 @@
 {
   "name": "node-ad-ldap",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.0.1",
+  "description": "Connection to Microsoft Active Directory",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/saostad/node-ad-ldap.git"
+  },
   "main": "dist/app.js",
   "types": "dist/app.d.ts",
   "scripts": {
