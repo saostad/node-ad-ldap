@@ -1,4 +1,4 @@
-import { SearchResultAttribute } from "./client";
+import { SearchResultAttribute } from "./typings/general-types";
 import ldap from "ldapjs";
 
 enum UserAttributes {

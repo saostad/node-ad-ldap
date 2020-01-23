@@ -2,14 +2,15 @@ import ldap from "ldapjs";
 import _ from "lodash";
 import { Group } from "./group";
 import { User } from "./user";
+import { SearchResultAttribute } from "./typings/general-types";
 
 export interface IClientConfig extends ldap.ClientOptions {
+  /**Password to connect to AD */
   secret: string;
+  /**User to connect to AD */
   baseDN: string;
-}
-export interface SearchResultAttribute {
-  type: string;
-  vals: string[];
+  /** Domain name with format: ldap://{domain.com} */
+  url: string;
 }
 
 export class AdClient {
@@ -65,38 +66,6 @@ export class AdClient {
         resolve(this.client);
       });
     });
-  }; /**end bind() */
-
-  private isDistinguishedName = (value: string) => {
-    if (!value || value.length === 0) return false;
-    this.re.isDistinguishedName.lastIndex = 0; // Reset the regular expression
-    return this.re.isDistinguishedName.test(value);
-  };
-
-  private parseDistinguishedName = (dn: string) => {
-    if (!dn) return dn;
-
-    dn = dn.replace(/"/g, '\\"');
-    return dn.replace("\\,", "\\\\,");
-  };
-
-  private getUserQueryFilter = (username?: string): string => {
-    if (!username) return "(objectCategory=User)";
-    if (this.isDistinguishedName(username)) {
-      return (
-        "(&(objectCategory=User)(distinguishedName=" +
-        this.parseDistinguishedName(username) +
-        "))"
-      );
-    }
-
-    return (
-      "(&(objectCategory=User)(|(sAMAccountName=" +
-      username +
-      ")(userPrincipalName=" +
-      username +
-      ")))"
-    );
   };
 
   public findUser = (username: string): Promise<User> => {
@@ -125,19 +94,6 @@ export class AdClient {
     });
   };
 
-  private getGroupQueryFilter = (groupName: string) => {
-    if (!groupName) return "(objectCategory=Group)";
-    if (this.isDistinguishedName(groupName)) {
-      return (
-        "(&(objectCategory=Group)(distinguishedName=" +
-        this.parseDistinguishedName(groupName) +
-        "))"
-      );
-    }
-    return "(&(objectCategory=Group)(cn=" + groupName + "))";
-  };
-
-  /**@returns first found group */
   public findGroup = (
     groupName: string,
     options?: { attributes: string[] },
@@ -173,13 +129,6 @@ export class AdClient {
     });
   };
 
-  private getCompoundFilter = (filter: string) => {
-    if (filter.charAt(0) === "(" && filter.charAt(filter.length - 1) === ")") {
-      return filter;
-    }
-    return "(" + filter + ")";
-  };
-
   public findUsers = (query: string): Promise<User[]> => {
     return new Promise((resolve, reject) => {
       const defaultUserFilter =
@@ -207,82 +156,6 @@ export class AdClient {
           results.on("end", () => {
             client.unbind();
             resolve(users.map(el => new User().rawToObj(el)));
-          });
-        });
-      });
-    });
-  };
-
-  private getDistinguishedNames = (filter: string): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const opts = {
-        filter: filter,
-        scope: "sub",
-        attributes: ["dn"],
-      };
-
-      this.bind().then(client => {
-        client.search(this.config.baseDN, opts, function(err, results) {
-          if (err) {
-            reject(err);
-          }
-
-          // Extract just the DN from the results
-          const dns = [];
-          results.on("searchEntry", entry => dns.push(entry.dn));
-          results.on("end", () => resolve(dns[0]));
-        });
-      });
-    });
-  };
-
-  private getUserDistinguishedName = (username: string): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      // Already a dn?
-      if (this.isDistinguishedName(username)) {
-        resolve(username);
-      }
-      const query = this.getUserQueryFilter(username);
-
-      this.getDistinguishedNames(query).then(dn => resolve(dn));
-    });
-  };
-
-  private joinAttributes = (...args) => {
-    for (let index = 0, length = args.length; index < length; index++) {
-      if (args[index]) {
-        return [];
-      }
-    }
-    return _.union(args);
-  };
-
-  private getGroupMembershipForDN = async (
-    dn: string,
-  ): Promise<SearchResultAttribute[][]> => {
-    return new Promise((resolve, reject) => {
-      const opts = {
-        filter: "(member=" + this.parseDistinguishedName(dn) + ")",
-        scope: "sub",
-        attributes: this.joinAttributes(this.defaultAttributes.group, [
-          "groupType",
-        ]),
-      };
-
-      this.bind().then(client => {
-        client.search(this.config.baseDN, opts, function(err, results) {
-          if (err) {
-            reject(err);
-            return;
-          }
-
-          const groups = [];
-          results.on("searchEntry", entry =>
-            groups.push(entry.attributes.map(el => el.json)),
-          );
-          results.on("end", () => {
-            resolve(groups);
-            client.unbind();
           });
         });
       });
