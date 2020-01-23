@@ -3,9 +3,7 @@
   "parserOptions": {
     "project": "./tsconfig.json"
   },
-  "plugins": [
-    "@typescript-eslint"
-  ],
+  "plugins": ["@typescript-eslint"],
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
@@ -23,6 +21,7 @@
     "no-async-promise-executor": 1,
     "@typescript-eslint/explicit-function-return-type": 0,
     "@typescript-eslint/indent": 0,
-    "no-console": "warn"
+    "no-console": "warn",
+    "@typescript-eslint/restrict-plus-operands": 0
   }
 }

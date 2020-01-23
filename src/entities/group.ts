@@ -1,5 +1,5 @@
-import { SearchResultAttribute } from "./typings/general-types";
 import ldap from "ldapjs";
+import { SearchResultAttribute } from "../typings/general-types";
 
 export enum GroupAttributes {
   adminDescription = "adminDescription",

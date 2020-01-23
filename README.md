@@ -6,8 +6,6 @@ Connection to Microsoft Active Directory using [LDAPjs](https://www.npmjs.com/pa
 - type-safe with [Typescript](https://www.typescriptlang.org/)
 - high-level functions to query from MS AD easily
 
-inspired by package [activedirectory](https://www.npmjs.com/package/activedirectory)
-
 ## How to use it:
 
 - `npm i node-ad-ldap`
@@ -24,9 +22,10 @@ const config: IClientConfig = {
 
 const adClient = new AdClient(config);
 
-const items = await adClient.getGroupMembershipForUser("USER_NAME");
+const items = await adClient.findUser("USER_NAME");
 
-items.map(el => console.log(el.cn));
+// always freeUp after you done the job!
+adClient.freeUp();
 ```
 
 ## functionalities:
@@ -61,3 +60,7 @@ adClient.bind().then(client => {
 ## TODO
 
 - add extra functionalities
+
+## Credits
+
+### inspired by package [activedirectory](https://www.npmjs.com/package/activedirectory)
