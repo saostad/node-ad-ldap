@@ -130,7 +130,7 @@ export class Group implements GroupFields {
   readonly whenChanged?: string[] | string;
   readonly whenCreated?: string[] | string;
 
-  setFields(fields: GroupFields) {
+  _setFields(fields: GroupFields) {
     for (const [key, value] of Object.entries(fields)) {
       if (Array.isArray(value) && value.length > 1) {
         this[key] = value as string[];
@@ -141,19 +141,19 @@ export class Group implements GroupFields {
     return this;
   }
 
-  rawToObj(
+  _rawToObj(
     data: SearchResultAttribute | SearchResultAttribute[] | ldap.Attribute[],
   ) {
     if (Array.isArray(data)) {
       data.forEach(el => {
         const fields: GroupFields = {};
         fields[el.type] = el.vals;
-        this.setFields(fields);
+        this._setFields(fields);
       });
     } else {
       const fields: GroupFields = {};
       fields[data.type] = data.vals;
-      this.setFields(fields);
+      this._setFields(fields);
     }
     return this;
   }

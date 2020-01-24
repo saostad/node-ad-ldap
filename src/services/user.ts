@@ -25,7 +25,10 @@ export async function findUser({
     attributes: defaultAttributes.user,
   };
   const data = await search({ client, base, options });
-  return new User().rawToObj(data[0].attributes);
+  if (data.length > 0) {
+    return new User()._rawToObj(data[0].attributes);
+  }
+  throw new Error(`no user found for ${username}`);
 }
 
 interface FindUsersInput extends FN {
@@ -48,23 +51,8 @@ export async function findUsers({
   const data = await search({ client, base, options });
 
   return data.map(el =>
-    new User().rawToObj(el.attributes.map(att => att.json)),
+    new User()._rawToObj(el.attributes.map(att => att.json)),
   );
-
-  // client.search(baseDN, opts, function onSearch(err, results) {
-  //     if (err) {
-  //       reject(err);
-  //     }
-
-  //     const users: SearchResultAttribute[][] = [];
-  //     results.on("searchEntry", entry =>
-  //       users.push(entry.attributes.map(el => el.json)),
-  //     );
-  //     results.on("end", () => {
-  //       client.unbind();
-  //       resolve(users.map(el => new User().rawToObj(el)));
-  //     });
-  //   });
 }
 
 interface GetUserDistinguishedNameFNInput extends FN {

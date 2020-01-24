@@ -13,26 +13,49 @@ export async function search({
   controls,
 }: SearchFNInput): Promise<SearchEntry[]> {
   return new Promise((resolve, reject) => {
-    client.search(base, options, controls, function searchCB(err, res) {
-      if (err) {
-        reject(err);
-      }
-      res.on("error", function errorHandler(err) {
-        reject(err);
-      });
-
-      const data: SearchEntry[] = [];
-      res.on("searchEntry", function searchEntry(entry) {
-        data.push(entry);
-      });
-
-      res.on("end", function searchEnd(res) {
-        if (res.status !== 0) {
-          reject(res);
+    if (controls) {
+      client.search(base, options, controls, function searchCB(err, res) {
+        if (err) {
+          reject(err);
         }
-        resolve(data);
+        res.on("error", function errorHandler(err) {
+          reject(err);
+        });
+
+        const data: SearchEntry[] = [];
+        res.on("searchEntry", function searchEntry(entry) {
+          data.push(entry);
+        });
+
+        res.on("end", function searchEnd(res) {
+          if (res.status !== 0) {
+            reject(res);
+          }
+          resolve(data);
+        });
       });
-    });
+    } else {
+      client.search(base, options, function searchCB(err, res) {
+        if (err) {
+          reject(err);
+        }
+        res.on("error", function errorHandler(err) {
+          reject(err);
+        });
+
+        const data: SearchEntry[] = [];
+        res.on("searchEntry", function searchEntry(entry) {
+          data.push(entry);
+        });
+
+        res.on("end", function searchEnd(res) {
+          if (res.status !== 0) {
+            reject(res);
+          }
+          resolve(data);
+        });
+      });
+    }
   });
 }
 
@@ -44,7 +67,6 @@ export async function getDistinguishedNames({
   client,
   base,
 }: GetDistinguishedNames): Promise<string> {
-  // return new Promise((resolve, reject) => {
   const options = {
     filter: filter,
     scope: "sub",
@@ -53,15 +75,4 @@ export async function getDistinguishedNames({
 
   const data = await search({ client, options, base });
   return data[0].dn;
-  // client.search(baseDN, opts, function(err, results) {
-  //   if (err) {
-  //     reject(err);
-  //   }
-
-  //   // Extract just the DN from the results
-  //   const dns = [];
-  //   results.on("searchEntry", entry => dns.push(entry.dn));
-  //   results.on("end", () => resolve(dns[0]));
-  // });
-  // });
 }

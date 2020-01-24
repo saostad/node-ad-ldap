@@ -24,23 +24,44 @@ const adClient = new AdClient(config);
 
 const items = await adClient.findUser("USER_NAME");
 
-// always freeUp after you done the job!
-adClient.freeUp();
+// always free-Up after you done the job!
+adClient.unbind();
 ```
 
 ## functionalities:
 
 ### findUser(username)
 
+```js
+/** return first found user or fail */
+const user = await adClient.findUser("USER_NAME");
+```
+
 ### findUsers(query)
+
+```js
+/** return array of users based on UPN */
+const users = await adClient.findUsers("DOMAIN.COM");
+```
 
 ### findGroup(groupName, options)
 
+```js
+/**return group or fail */
+const group = await adClient.findGroup("GROUP_NAME");
+```
+
 ### getGroupMembershipForUser(username)
+
+```js
+/**return array of groups */
+const groups = await adClient.getGroupMembershipForUser("USER_NAME");
+```
 
 ### bind()
 
-returns a connected ldap client that is useful for use flexibility of [ldap.js](http://ldapjs.org/) directly
+returns a connected ldap client that is useful for use flexibility of [ldap.js](http://ldapjs.org/) directly.
+NOTICE: lpad.js is using node EventEmitters not ES6 Promises
 
 ```js
 adClient.bind().then(client => {
@@ -59,7 +80,8 @@ adClient.bind().then(client => {
 
 ## TODO
 
-- add extra functionalities
+- [ ] make baseDN optional
+- [ ] add where param for find query
 
 ## Credits
 

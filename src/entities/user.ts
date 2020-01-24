@@ -318,7 +318,7 @@ export class User {
   readonly whenCreated: string[] | string;
   readonly wWWHomePage: string[] | string;
 
-  setFields(fields: UserFields) {
+  _setFields(fields: UserFields) {
     for (const [key, value] of Object.entries(fields)) {
       if (Array.isArray(value) && value.length > 1) {
         this[key] = value as string[];
@@ -329,19 +329,19 @@ export class User {
     return this;
   }
 
-  rawToObj(
+  _rawToObj(
     data: SearchResultAttribute | SearchResultAttribute[] | ldap.Attribute[],
   ) {
     if (Array.isArray(data)) {
       data.forEach(el => {
         const fields: UserFields = {};
         fields[el.type] = el.vals;
-        this.setFields(fields);
+        this._setFields(fields);
       });
     } else {
       const fields: UserFields = {};
       fields[data.type] = data.vals;
-      this.setFields(fields);
+      this._setFields(fields);
     }
     return this;
   }
