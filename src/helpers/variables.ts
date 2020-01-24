@@ -23,5 +23,5 @@ export const defaultAttributes = {
     "objectCategory",
     "objectClass",
   ],
-  group: ["dn", "cn", "description"],
+  group: ["cn", "description"],
 };

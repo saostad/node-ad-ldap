@@ -48,6 +48,8 @@ async function getGroupMembershipForDN({
   };
 
   const data = await search({ client, options, base });
+  // console.log(`File: group.ts,`, `Line: 51 => `, data[0].attributes);
+
   return data.map(el => el.attributes.map(att => att.json));
 }
 

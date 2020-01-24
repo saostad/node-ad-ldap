@@ -38,7 +38,10 @@ export class AdClient {
 
   constructor(config: IClientConfig) {
     this.config = config;
-    this.client = ldap.createClient(this.config);
+    this.client = ldap.createClient({
+      ...this.config,
+      log: this.config.logger,
+    });
     this.bind();
   }
 

@@ -3,7 +3,7 @@ export * from "./ad-client";
 /** HOW TO USE */
 import { AdClient } from "./ad-client";
 import { config } from "dotenv";
-import { createLogger } from "fast-node-logger";
+import { createLogger, writeLog } from "fast-node-logger";
 config();
 
 let adClient: AdClient;
@@ -19,13 +19,12 @@ async function main() {
     logger,
   });
 
-  const data = await adClient.getGroupMembershipForUser("sostad");
+  const data = await adClient
+    .findGroup("Group_7753ae4a-1a6e-4294-a5f8-eca521679dd6")
+    .catch(err => writeLog(err, { stdout: true }));
 
-  console.log(`File: app.ts,`, `Line: 9 => `, data.length);
+  console.log(`File: app.ts,`, `Line: 9 => `, data);
 }
-main()
-  .then()
-  .catch(err => console.log(`File: app.ts,`, `Line: 21 => `, err))
-  .finally(() => {
-    adClient.unbind();
-  });
+main().finally(() => {
+  adClient.unbind();
+});

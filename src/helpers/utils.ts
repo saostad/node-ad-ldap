@@ -57,11 +57,6 @@ export function getCompoundFilter(filter: string) {
   return "(" + filter + ")";
 }
 
-export function joinAttributes(...args) {
-  for (let index = 0, length = args.length; index < length; index++) {
-    if (args[index]) {
-      return [];
-    }
-  }
-  return _.union(args);
+export function joinAttributes(...args: string[][]) {
+  return _.union(...args);
 }

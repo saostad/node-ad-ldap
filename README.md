@@ -81,7 +81,9 @@ adClient.bind().then(client => {
 ## TODO
 
 - [ ] make baseDN optional
-- [ ] add where param for find query
+- [ ] add where param to queries to be able of search base on fields
+- [ ] get list of members of a group
+- [ ] add options to have better flexibility on filters and controls and return attributes
 
 ## Credits
 
