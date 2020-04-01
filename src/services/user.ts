@@ -1,4 +1,4 @@
-import ldap from "ldapjs";
+import ldap, { SearchOptions } from "ldapjs";
 import { User } from "../entities/user";
 import { FN } from "../typings/general-types";
 import { defaultAttributes } from "../helpers/variables";
@@ -42,7 +42,7 @@ export async function findUsers({
   const defaultUserFilter =
     "(|(objectClass=user)(objectClass=person))(!(objectClass=computer))(!(objectClass=group))";
 
-  const options = {
+  const options: SearchOptions = {
     filter: "(&" + defaultUserFilter + getCompoundFilter(query) + ")",
     scope: "sub",
     attributes: defaultAttributes.user,
@@ -50,8 +50,8 @@ export async function findUsers({
 
   const data = await search({ client, base, options });
 
-  return data.map(el =>
-    new User()._rawToObj(el.attributes.map(att => att.json)),
+  return data.map((el) =>
+    new User()._rawToObj(el.attributes.map((att) => att.json)),
   );
 }
 

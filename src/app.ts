@@ -20,8 +20,8 @@ export * from "./ad-client";
 //   });
 
 //   const data = await adClient
-//     .findGroup("Group_7753ae4a-1a6e-4294-a5f8-eca521679dd6")
-//     .catch(err => writeLog(err, { stdout: true }));
+//     .findGroup("AB-ST2000")
+//     .catch((err) => writeLog(err, { stdout: true }));
 
 //   console.log(`File: app.ts,`, `Line: 9 => `, data);
 // }

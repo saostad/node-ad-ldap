@@ -8,6 +8,7 @@ import { defaultAttributes } from "../helpers/variables";
 import { SearchResultAttribute, FN } from "../typings/general-types";
 import { search } from "./shared";
 import { getUserDistinguishedName } from "./user";
+import { SearchOptions } from "ldapjs";
 
 interface FindGroupInput extends FN {
   groupName: string;
@@ -20,7 +21,7 @@ export async function findGroup({
   client,
   base,
 }: FindGroupInput): Promise<Group> {
-  const options = {
+  const options: SearchOptions = {
     filter: getGroupQueryFilter(groupName),
     scope: "sub",
     attributes: attributes ?? defaultAttributes.group,
@@ -41,7 +42,7 @@ async function getGroupMembershipForDN({
   client,
   base,
 }: GetGroupMembershipForDNFNInput): Promise<SearchResultAttribute[][]> {
-  const options = {
+  const options: SearchOptions = {
     filter: "(member=" + parseDistinguishedName(dn) + ")",
     scope: "sub",
     attributes: joinAttributes(defaultAttributes.group, ["groupType"]),
@@ -50,7 +51,7 @@ async function getGroupMembershipForDN({
   const data = await search({ client, options, base });
   // console.log(`File: group.ts,`, `Line: 51 => `, data[0].attributes);
 
-  return data.map(el => el.attributes.map(att => att.json));
+  return data.map((el) => el.attributes.map((att) => att.json));
 }
 
 interface GetGroupMembershipForUserFNInput extends FN {
@@ -64,5 +65,5 @@ export async function getGroupMembershipForUser({
   const dn = await getUserDistinguishedName({ username, base, client });
 
   const groups = await getGroupMembershipForDN({ dn, client, base });
-  return groups.map(el => new Group()._rawToObj(el));
+  return groups.map((el) => new Group()._rawToObj(el));
 }

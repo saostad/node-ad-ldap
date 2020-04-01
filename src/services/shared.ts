@@ -67,7 +67,7 @@ export async function getDistinguishedNames({
   client,
   base,
 }: GetDistinguishedNames): Promise<string> {
-  const options = {
+  const options: SearchOptions = {
     filter: filter,
     scope: "sub",
     attributes: ["dn"],
