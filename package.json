@@ -1,6 +1,6 @@
 {
   "name": "node-ad-ldap",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Query Microsoft Active Directory",
   "repository": {
     "type": "git",

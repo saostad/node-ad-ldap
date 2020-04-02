@@ -12,6 +12,10 @@ export async function search({
   options,
   controls,
 }: SearchFNInput): Promise<SearchEntry[]> {
+  /** default time limit for query 10 min
+   * if not provided it in options, will use default
+   */
+  options.timeLimit = options.timeLimit ?? 6000;
   return new Promise((resolve, reject) => {
     if (controls) {
       client.search(base, options, controls, function searchCB(err, res) {

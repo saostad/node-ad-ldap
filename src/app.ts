@@ -20,7 +20,7 @@ export * from "./ad-client";
 //   });
 
 //   const data = await adClient
-//     .findGroup("AB-ST2000")
+//     .findUsers("kcswest.com")
 //     .catch((err) => writeLog(err, { stdout: true }));
 
 //   console.log(`File: app.ts,`, `Line: 9 => `, data);
