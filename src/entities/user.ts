@@ -1,7 +1,7 @@
 import ldap from "ldapjs";
 import { SearchResultAttribute } from "../typings/general-types";
 
-enum UserAttributes {
+export enum UserAttributes {
   accountExpires = "accountExpires",
   adminDescription = "adminDescription",
   adminDisplayName = "adminDisplayName",
@@ -156,11 +156,12 @@ enum UserAttributes {
   wWWHomePage = "wWWHomePage",
 }
 
-type GroupFieldsName = {
+type UserFieldsName = {
   [key in keyof typeof UserAttributes]?: any;
 };
 
-export interface UserFields extends GroupFieldsName {
+export interface UserFields extends UserFieldsName {
+  /**this is how override field type */
   wWWHomePage?: boolean;
 }
 
@@ -333,7 +334,7 @@ export class User {
     data: SearchResultAttribute | SearchResultAttribute[] | ldap.Attribute[],
   ) {
     if (Array.isArray(data)) {
-      data.forEach(el => {
+      data.forEach((el) => {
         const fields: UserFields = {};
         fields[el.type] = el.vals;
         this._setFields(fields);

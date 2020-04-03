@@ -64,14 +64,14 @@ returns a connected ldap client that is useful for use flexibility of [ldap.js](
 NOTICE: lpad.js is using node EventEmitters not ES6 Promises
 
 ```js
-adClient.bind().then(client => {
+adClient.bind().then((client) => {
   client.search(this.config.baseDN, opts, (err, res) => {
     if (err) {
       reject(err);
     }
-    res.on("searchEntry", entry => {});
-    res.on("error", err => {});
-    res.on("end", function(result) {
+    res.on("searchEntry", (entry) => {});
+    res.on("error", (err) => {});
+    res.on("end", function (result) {
       client.unbind();
     });
   });
@@ -83,7 +83,10 @@ adClient.bind().then(client => {
 - [ ] make baseDN optional
 - [ ] add where param to queries to be able of search base on fields
 - [ ] get list of members of a group
-- [ ] add options to have better flexibility on filters and controls and return attributes
+- [ ] add options to have better flexibility on filters and controls
+- [ ] specify return attributes
+- [ ] add Windows Integrated Authentication [Kerberos](https://github.com/mongodb-js/kerberos)
+- [ ] dynamic query generator
 
 ## Credits
 

@@ -1,5 +1,5 @@
 import ldap, { SearchOptions } from "ldapjs";
-import { User } from "../entities/user";
+import { User, UserAttributes } from "../entities/user";
 import { FN } from "../typings/general-types";
 import { defaultAttributes } from "../helpers/variables";
 import {
@@ -33,11 +33,13 @@ export async function findUser({
 
 interface FindUsersInput extends FN {
   query: string;
+  attributes?: Partial<UserAttributes>[];
 }
 export async function findUsers({
   query,
   base,
   client,
+  attributes,
 }: FindUsersInput): Promise<User[]> {
   const defaultUserFilter =
     "(|(objectClass=user)(objectClass=person))(!(objectClass=computer))(!(objectClass=group))";
@@ -45,7 +47,7 @@ export async function findUsers({
   const options: SearchOptions = {
     filter: "(&" + defaultUserFilter + getCompoundFilter(query) + ")",
     scope: "sub",
-    attributes: defaultAttributes.user,
+    attributes: attributes ?? defaultAttributes.user,
   };
 
   const data = await search({ client, base, options });

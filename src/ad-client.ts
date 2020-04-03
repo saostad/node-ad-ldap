@@ -1,22 +1,12 @@
 import ldap from "ldapjs";
+import { Logger } from "pino";
 import {
   findUser,
   findUsers,
   findGroup,
   getGroupMembershipForUser,
 } from "./services";
-
-/** copied code from @types/pino */
-interface LogFn {
-  (msg: string, ...args: any[]): void;
-  (obj: object, msg?: string, ...args: any[]): void;
-}
-
-/** minimum requirement for logging */
-interface Logger {
-  info: LogFn;
-  error: LogFn;
-}
+import { UserAttributes } from "./entities/user";
 
 export interface IClientConfig extends ldap.ClientOptions {
   /**Password to connect to AD */
@@ -27,8 +17,13 @@ export interface IClientConfig extends ldap.ClientOptions {
   baseDN?: string;
   /** Domain name with format: ldap://{domain.com} */
   url: string;
-  /**instance for preferred logger */
+  /**instance of pino logger */
   logger?: Logger;
+}
+
+interface FindUsersInput {
+  searchCriteria: string;
+  attributes?: Partial<UserAttributes[]>;
 }
 
 export class AdClient {
@@ -46,9 +41,9 @@ export class AdClient {
   }
 
   public bind = (): Promise<ldap.Client> => {
-    this.logger?.info("bind()");
+    this.logger?.trace("bind()");
     return new Promise((resolve, reject) => {
-      this.client.bind(this.config.bindDN, this.config.secret, err => {
+      this.client.bind(this.config.bindDN, this.config.secret, (err) => {
         if (err) {
           reject(err);
         }
@@ -59,12 +54,12 @@ export class AdClient {
   };
 
   public unbind = () => {
-    this.logger?.info("unbind()");
+    this.logger?.trace("unbind()");
     this.client.unbind();
   };
 
   private async connect() {
-    this.logger?.info("connect()");
+    this.logger?.trace("connect()");
     if (this.client && this.client.connected) {
       return this.client;
     }
@@ -74,7 +69,7 @@ export class AdClient {
 
   /**return first found user */
   public async findUser(username: string) {
-    this.logger?.info("findUser()");
+    this.logger?.trace("findUser()");
     await this.connect();
     return findUser({
       client: this.client,
@@ -84,20 +79,21 @@ export class AdClient {
   }
 
   /**return array of users based on UPN */
-  public async findUsers(userPrincipalName: string) {
-    this.logger?.info("findUsers()");
-    const query = `userPrincipalName=*${userPrincipalName}`;
+  public async findUsers({ searchCriteria, attributes }: FindUsersInput) {
+    this.logger?.trace("findUsers()");
+    const query = `userPrincipalName=*${searchCriteria}`;
     await this.connect();
     return findUsers({
       client: this.client,
       base: this.config.baseDN,
       query,
+      attributes,
     });
   }
 
   /** return first found group or fail */
   public async findGroup(groupName: string) {
-    this.logger?.info("findGroup()");
+    this.logger?.trace("findGroup()");
     await this.connect();
     return findGroup({
       client: this.client,
@@ -108,7 +104,7 @@ export class AdClient {
 
   /** return array of groups */
   public async getGroupMembershipForUser(username: string) {
-    this.logger?.info("getGroupMembershipForUser()");
+    this.logger?.trace("getGroupMembershipForUser()");
     await this.connect();
     return getGroupMembershipForUser({
       client: this.client,
