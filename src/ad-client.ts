@@ -1,4 +1,4 @@
-import ldap, { SearchOptions, Control } from "ldapjs";
+import ldap, { SearchOptions, Control, SearchEntry } from "ldapjs";
 import type { Logger } from "pino";
 import {
   findUser,
@@ -138,7 +138,12 @@ export class AdClient {
   }
 
   /**raw search to provided full flexibility */
-  public async query({ options, controls, base, client }: QueryFnInput) {
+  public async query<T extends ldap.SearchEntry>({
+    options,
+    controls,
+    base,
+    client,
+  }: QueryFnInput): Promise<T[]> {
     this.logger?.trace("query()");
     await this.connect();
 
@@ -149,4 +154,8 @@ export class AdClient {
       controls,
     });
   }
+
+  a = () => {
+    this.query<{}>({});
+  };
 }

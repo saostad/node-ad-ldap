@@ -18,7 +18,7 @@ export async function search({
   options.timeLimit = options.timeLimit ?? 6000;
   return new Promise((resolve, reject) => {
     if (controls) {
-      client.search(base, options, controls, function searchCB(err, res) {
+      client.search(base, options, controls, function searchCallBack(err, res) {
         if (err) {
           reject(err);
         }
