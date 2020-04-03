@@ -1,4 +1,4 @@
-import ldap from "ldapjs";
+import ldap, { SearchOptions, Control } from "ldapjs";
 import type { Logger } from "pino";
 import {
   findUser,
@@ -8,7 +8,7 @@ import {
 } from "./services";
 import { UserAttributes } from "./entities/user";
 import { GroupAttributes } from "./entities/group";
-import { search, SearchFnInput } from "./services/shared";
+import { search } from "./services/shared";
 
 export const UserLdapAttributes = UserAttributes;
 export const GroupLdapAttributes = GroupAttributes;
@@ -32,10 +32,16 @@ interface FindUsersInputOptions {
 interface FindGroupsInputOptions {
   attributes?: Partial<GroupAttributes[]>;
 }
+interface QueryFnInput {
+  client?: ldap.Client;
+  options?: SearchOptions;
+  controls?: Control | Control[];
+  base?: string;
+}
 
 export class AdClient {
   private config: IClientConfig;
-  private client?: ldap.Client;
+  private client!: ldap.Client;
   private logger?: Logger;
   public baseDN: string;
 
@@ -132,7 +138,7 @@ export class AdClient {
   }
 
   /**raw search to provided full flexibility */
-  public async query({ options, controls, base, client }: SearchFnInput) {
+  public async query({ options, controls, base, client }: QueryFnInput) {
     this.logger?.trace("query()");
     await this.connect();
 
