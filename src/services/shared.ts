@@ -1,7 +1,7 @@
 import { SearchOptions, Control, SearchEntry } from "ldapjs";
 import { FN } from "../typings/general-types";
 
-interface SearchFNInput extends FN {
+export interface SearchFnInput extends FN {
   options?: SearchOptions;
   controls?: Control | Control[];
 }
@@ -11,7 +11,7 @@ export async function search({
   base,
   options,
   controls,
-}: SearchFNInput): Promise<SearchEntry[]> {
+}: SearchFnInput): Promise<SearchEntry[]> {
   /** default time limit for query 10 min
    * if not provided it in options, will use default
    */

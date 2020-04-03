@@ -8,6 +8,7 @@ import {
 } from "./services";
 import { UserAttributes } from "./entities/user";
 import { GroupAttributes } from "./entities/group";
+import { search, SearchFnInput } from "./services/shared";
 
 export const UserLdapAttributes = UserAttributes;
 export const GroupLdapAttributes = GroupAttributes;
@@ -127,6 +128,19 @@ export class AdClient {
       base: this.config.baseDN,
       username,
       attributes: options.attributes,
+    });
+  }
+
+  /**raw search to provided full flexibility */
+  public async query({ options, controls, base, client }: SearchFnInput) {
+    this.logger?.trace("query()");
+    await this.connect();
+
+    return search({
+      client: client ?? this.client,
+      base: base ?? this.config.baseDN,
+      options,
+      controls,
     });
   }
 }
