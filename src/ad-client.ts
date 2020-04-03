@@ -1,4 +1,4 @@
-import ldap, { SearchOptions, Control } from "ldapjs";
+import ldap, { SearchOptions, Control, SearchEntryObject } from "ldapjs";
 import type { Logger } from "pino";
 import {
   findUser,
@@ -148,5 +148,25 @@ export class AdClient {
       options,
       controls,
     });
+  }
+
+  /**raw search returns just attributes */
+  public async queryAttributes({
+    options,
+    controls,
+    base,
+    client,
+  }: QueryFnInput): Promise<SearchEntryObject[]> {
+    this.logger?.trace("queryAttributes()");
+    await this.connect();
+
+    const data = await search({
+      client: client ?? this.client,
+      base: base ?? this.config.baseDN,
+      options,
+      controls,
+    });
+
+    return data.map((entry) => entry.object);
   }
 }
