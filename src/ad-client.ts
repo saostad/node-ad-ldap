@@ -1,5 +1,5 @@
 import ldap from "ldapjs";
-import { Logger } from "pino";
+import type { Logger } from "pino";
 import {
   findUser,
   findUsers,
@@ -7,6 +7,10 @@ import {
   getGroupMembershipForUser,
 } from "./services";
 import { UserAttributes } from "./entities/user";
+import { GroupAttributes } from "./entities/group";
+
+export const UserLdapAttributes = UserAttributes;
+export const GroupLdapAttributes = GroupAttributes;
 
 export interface IClientConfig extends ldap.ClientOptions {
   /**Password to connect to AD */
@@ -21,18 +25,22 @@ export interface IClientConfig extends ldap.ClientOptions {
   logger?: Logger;
 }
 
-interface FindUsersInput {
-  searchCriteria: string;
+interface FindUsersInputOptions {
   attributes?: Partial<UserAttributes[]>;
+}
+interface FindGroupsInputOptions {
+  attributes?: Partial<GroupAttributes[]>;
 }
 
 export class AdClient {
   private config: IClientConfig;
   private client?: ldap.Client;
   private logger?: Logger;
+  public baseDN: string;
 
   constructor(config: IClientConfig) {
     this.config = config;
+    this.baseDN = config.baseDN;
     this.client = ldap.createClient({
       ...this.config,
       log: this.config.logger,
@@ -68,18 +76,22 @@ export class AdClient {
   }
 
   /**return first found user */
-  public async findUser(username: string) {
+  public async findUser(username: string, options?: FindUsersInputOptions) {
     this.logger?.trace("findUser()");
     await this.connect();
     return findUser({
       client: this.client,
       base: this.config.baseDN,
       username,
+      attributes: options.attributes,
     });
   }
 
   /**return array of users based on UPN */
-  public async findUsers({ searchCriteria, attributes }: FindUsersInput) {
+  public async findUsers(
+    searchCriteria: string,
+    options?: FindUsersInputOptions,
+  ) {
     this.logger?.trace("findUsers()");
     const query = `userPrincipalName=*${searchCriteria}`;
     await this.connect();
@@ -87,29 +99,34 @@ export class AdClient {
       client: this.client,
       base: this.config.baseDN,
       query,
-      attributes,
+      attributes: options.attributes,
     });
   }
 
   /** return first found group or fail */
-  public async findGroup(groupName: string) {
+  public async findGroup(groupName: string, options?: FindGroupsInputOptions) {
     this.logger?.trace("findGroup()");
     await this.connect();
     return findGroup({
       client: this.client,
       base: this.config.baseDN,
       groupName,
+      attributes: options.attributes,
     });
   }
 
   /** return array of groups */
-  public async getGroupMembershipForUser(username: string) {
+  public async getGroupMembershipForUser(
+    username: string,
+    options?: FindGroupsInputOptions,
+  ) {
     this.logger?.trace("getGroupMembershipForUser()");
     await this.connect();
     return getGroupMembershipForUser({
       client: this.client,
       base: this.config.baseDN,
       username,
+      attributes: options.attributes,
     });
   }
 }

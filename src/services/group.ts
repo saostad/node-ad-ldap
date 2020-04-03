@@ -1,4 +1,4 @@
-import { Group } from "../entities/group";
+import { Group, GroupAttributes } from "../entities/group";
 import {
   getGroupQueryFilter,
   parseDistinguishedName,
@@ -13,7 +13,7 @@ import { SearchOptions } from "ldapjs";
 interface FindGroupInput extends FN {
   groupName: string;
   base: string;
-  attributes?: string[];
+  attributes?: Partial<GroupAttributes[]>;
 }
 export async function findGroup({
   groupName,
@@ -34,14 +34,14 @@ export async function findGroup({
   throw new Error(`Group ${groupName} not found`);
 }
 
-interface GetGroupMembershipForDNFNInput extends FN {
+interface GetGroupMembershipForDnFnInput extends FN {
   dn: string;
 }
 async function getGroupMembershipForDN({
   dn,
   client,
   base,
-}: GetGroupMembershipForDNFNInput): Promise<SearchResultAttribute[][]> {
+}: GetGroupMembershipForDnFnInput): Promise<SearchResultAttribute[][]> {
   const options: SearchOptions = {
     filter: "(member=" + parseDistinguishedName(dn) + ")",
     scope: "sub",
@@ -49,20 +49,27 @@ async function getGroupMembershipForDN({
   };
 
   const data = await search({ client, options, base });
-  // console.log(`File: group.ts,`, `Line: 51 => `, data[0].attributes);
-
   return data.map((el) => el.attributes.map((att) => att.json));
 }
 
-interface GetGroupMembershipForUserFNInput extends FN {
+interface GetGroupMembershipForUserFnInput extends FN {
   username: string;
+  attributes?: Partial<GroupAttributes[]>;
 }
 export async function getGroupMembershipForUser({
   username,
   client,
   base,
-}: GetGroupMembershipForUserFNInput) {
+  attributes,
+}: GetGroupMembershipForUserFnInput): Promise<Group[]> {
   const dn = await getUserDistinguishedName({ username, base, client });
+
+  // TODO: add attributes param to return just selected attributes instead of default fields
+  if (attributes) {
+    console.warn(
+      `attribute selection for this function doesn't implemented yet.`,
+    );
+  }
 
   const groups = await getGroupMembershipForDN({ dn, client, base });
   return groups.map((el) => new Group()._rawToObj(el));

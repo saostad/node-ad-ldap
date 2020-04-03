@@ -10,7 +10,7 @@ Connection to Microsoft Active Directory using [LDAPjs](https://www.npmjs.com/pa
 
 - `npm i node-ad-ldap`
 
-```js
+```ts
 import { IClientConfig, AdClient } from "node-ad-ldap";
 
 const config: IClientConfig = {
@@ -32,28 +32,28 @@ adClient.unbind();
 
 ### findUser(username)
 
-```js
+```ts
 /** return first found user or fail */
 const user = await adClient.findUser("USER_NAME");
 ```
 
 ### findUsers(query)
 
-```js
+```ts
 /** return array of users based on UPN */
 const users = await adClient.findUsers("DOMAIN.COM");
 ```
 
 ### findGroup(groupName, options)
 
-```js
+```ts
 /**return group or fail */
 const group = await adClient.findGroup("GROUP_NAME");
 ```
 
 ### getGroupMembershipForUser(username)
 
-```js
+```ts
 /**return array of groups */
 const groups = await adClient.getGroupMembershipForUser("USER_NAME");
 ```
@@ -84,7 +84,7 @@ adClient.bind().then((client) => {
 - [ ] add where param to queries to be able of search base on fields
 - [ ] get list of members of a group
 - [ ] add options to have better flexibility on filters and controls
-- [ ] specify return attributes
+- [x] specify return attributes
 - [ ] add Windows Integrated Authentication [Kerberos](https://github.com/mongodb-js/kerberos)
 - [ ] dynamic query generator
 

@@ -11,6 +11,7 @@ import { search, getDistinguishedNames } from "./shared";
 
 interface FindUserInput extends FN {
   username: string;
+  attributes?: Partial<UserAttributes>[];
 }
 
 /** @returns first found item */
@@ -18,11 +19,12 @@ export async function findUser({
   username,
   client,
   base,
+  attributes,
 }: FindUserInput): Promise<User> {
   const options: ldap.SearchOptions = {
     filter: getUserQueryFilter(username),
     scope: "sub",
-    attributes: defaultAttributes.user,
+    attributes: attributes ?? defaultAttributes.user,
   };
   const data = await search({ client, base, options });
   if (data.length > 0) {
