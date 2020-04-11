@@ -28,6 +28,8 @@ const items = await adClient.findUser("USER_NAME");
 adClient.unbind();
 ```
 
+## API DOC
+
 ## functionalities:
 
 ### findUser(username)
