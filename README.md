@@ -30,6 +30,8 @@ adClient.unbind();
 
 ## API DOC
 
+for full API documentation look at [API Website](https://saostad.github.io/node-ad-ldap/classes/_index_.adclient.html)
+
 ## functionalities:
 
 ### findUser(username)
