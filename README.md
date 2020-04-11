@@ -63,6 +63,8 @@ const groups = await adClient.getGroupMembershipForUser("USER_NAME");
 returns a connected ldap client that is useful for use flexibility of [ldap.js](http://ldapjs.org/) directly.
 NOTICE: lpad.js is using node EventEmitters not ES6 Promises
 
+### Advance Users:
+
 ```js
 adClient.bind().then((client) => {
   client.search(this.config.baseDN, opts, (err, res) => {
@@ -81,12 +83,10 @@ adClient.bind().then((client) => {
 ## TODO
 
 - [ ] make baseDN optional
-- [ ] add where param to queries to be able of search base on fields
 - [ ] get list of members of a group
 - [ ] add options to have better flexibility on filters and controls
 - [x] specify return attributes
 - [ ] add Windows Integrated Authentication [Kerberos](https://github.com/mongodb-js/kerberos)
-- [ ] dynamic query generator
 
 ## Credits
 

@@ -106,7 +106,7 @@ export class AdClient {
       client: this.client,
       base: this.config.baseDN,
       query,
-      attributes: options.attributes,
+      attributes: options?.attributes,
     });
   }
 
@@ -118,7 +118,7 @@ export class AdClient {
       client: this.client,
       base: this.config.baseDN,
       groupName,
-      attributes: options.attributes,
+      attributes: options?.attributes,
     });
   }
 
@@ -133,7 +133,7 @@ export class AdClient {
       client: this.client,
       base: this.config.baseDN,
       username,
-      attributes: options.attributes,
+      attributes: options?.attributes,
     });
   }
 
