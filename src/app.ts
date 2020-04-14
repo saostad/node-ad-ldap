@@ -3,7 +3,6 @@ import { AdClient, UserLdapAttributes, GroupLdapAttributes } from "./index";
 import { config } from "dotenv";
 import { createLogger, writeLog } from "fast-node-logger";
 
-import { Control } from "ldapjs/lib/controls/";
 config();
 
 let adClient: AdClient;
@@ -18,6 +17,22 @@ async function main() {
     baseDN: "DC=ki,DC=local",
     logger,
   });
+
+  // /** get displayName and distinguished name  of empty groups */
+  // const groups = await adClient.query({
+  //   options: {
+  //     filter: "(&(objectClass=group)(!(member=*)))",
+  //     attributes: ["displayName", "dn"],
+  //     scope: "sub",
+  //     paged: true,
+  //   },
+  // });
+  // console.log(`File: app.ts,`, `Line: 28 => `, groups);
+
+  // const groupMemberships = await adClient.getGroupMembershipForUser(`sostad`, {
+  //   attributes: [GroupLdapAttributes.displayName],
+  // });
+  // console.log(`File: app.ts,`, `Line: 24 => `, groupMemberships);
 
   // const users = await adClient
   //   .findUsers("kajimausa.com", {
@@ -76,5 +91,5 @@ async function main() {
   // );
 }
 main().finally(() => {
-  // adClient.unbind();
+  adClient.unbind();
 });

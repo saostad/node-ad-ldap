@@ -1,7 +1,7 @@
 {
   "name": "node-ad-ldap",
-  "version": "1.4.0",
-  "description": "Query Microsoft Active Directory",
+  "version": "1.5.0",
+  "description": "Promise based ldap client",
   "repository": {
     "type": "git",
     "url": "https://github.com/saostad/node-ad-ldap.git"

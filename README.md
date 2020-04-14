@@ -1,10 +1,9 @@
 # Active directory connection
 
-Connection to Microsoft Active Directory using [LDAPjs](https://www.npmjs.com/package/ldapjs)
+LDAP Client to do low level promise base interaction with ldap server
 
 - Promise based functions
 - type-safe with [Typescript](https://www.typescriptlang.org/)
-- high-level functions to query from MS AD easily
 
 ## How to use it:
 
@@ -22,7 +21,7 @@ const config: IClientConfig = {
 
 const adClient = new AdClient(config);
 
-const items = await adClient.findUser("USER_NAME");
+// do something with functionalities
 
 // always free-Up after you done the job!
 adClient.unbind();
@@ -34,42 +33,48 @@ for full API documentation look at [API Website](https://saostad.github.io/node-
 
 ## functionalities:
 
-### findUser(username)
+#### async queryAttributes()
 
 ```ts
-/** return first found user or fail */
-const user = await adClient.findUser("USER_NAME");
+/** get displayName of all users */
+const users = await adClient.queryAttributes({
+  options: {
+    filter:
+      "(&(|(objectClass=user)(objectClass=person))(!(objectClass=computer))(!(objectClass=group)))",
+    attributes: ["displayName"],
+    scope: "sub",
+    paged: true,
+  },
+});
+
+// always unbind after finish the operation to prevent memory leak
+adClient.unbind();
 ```
 
-### findUsers(query)
+### Advance Uses:
+
+#### async query() (raw search to provided full flexibility)
 
 ```ts
-/** return array of users based on UPN */
-const users = await adClient.findUsers("DOMAIN.COM");
+/** get displayName and distinguished name  of empty groups */
+const groups = await adClient.query({
+  options: {
+    filter: "(&(objectClass=group)(!(member=*)))",
+    attributes: ["displayName", "dn"],
+    scope: "sub",
+    paged: true,
+  },
+});
+
+// always unbind after finish the operation to prevent memory leak
+adClient.unbind();
 ```
 
-### findGroup(groupName, options)
+#### async bind() to access underlying api. returns a connected [ldap.js](http://ldapjs.org/) client.
+
+#### NOTICE: lpad.js is using node EventEmitters not ES6 Promises
 
 ```ts
-/**return group or fail */
-const group = await adClient.findGroup("GROUP_NAME");
-```
-
-### getGroupMembershipForUser(username)
-
-```ts
-/**return array of groups */
-const groups = await adClient.getGroupMembershipForUser("USER_NAME");
-```
-
-### bind()
-
-returns a connected ldap client that is useful for use flexibility of [ldap.js](http://ldapjs.org/) directly.
-NOTICE: lpad.js is using node EventEmitters not ES6 Promises
-
-### Advance Users:
-
-```js
 adClient.bind().then((client) => {
   client.search(this.config.baseDN, opts, (err, res) => {
     if (err) {
@@ -86,12 +91,5 @@ adClient.bind().then((client) => {
 
 ## TODO
 
-- [ ] make baseDN optional
-- [ ] get list of members of a group
-- [ ] add options to have better flexibility on filters and controls
-- [x] specify return attributes
+- [ ] remove dependency to [ldap.js](http://ldapjs.org/) package
 - [ ] add Windows Integrated Authentication [Kerberos](https://github.com/mongodb-js/kerberos)
-
-## Credits
-
-### inspired by package [activedirectory](https://www.npmjs.com/package/activedirectory)
