@@ -12,6 +12,7 @@
     "format": "prettier --check \"src/**/*.ts\" --write",
     "lint": "eslint --ext \".ts,.js\" src --quiet",
     "gen-docs": "typedoc",
+    "postgen-docs": "node ./github/github.js",
     "ts-node": "ts-node src/app.ts",
     "start": "nodemon --watch src -e ts --exec \"npm run ts-node\"",
     "prepublishOnly": "tsc",
