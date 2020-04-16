@@ -1,3 +1,5 @@
+## This package deprecated in favor of [ldap-studio](https://github.com/saostad/ldap-studio) package. I encourage you to replace it to take advantage of improved user experience on [ldap-studio](https://github.com/saostad/ldap-studio)
+
 # Active directory connection
 
 LDAP Client to do low level promise base interaction with ldap server
